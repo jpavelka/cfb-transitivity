@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+    <head>
+        <style>
+            table.full-width{
+                width: 100%;
+            }
+            img.team-logo{
+                height: 30px;
+            }
+            p.record{
+                font-weight: "normal";
+            }
+        </style>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+	    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                $('#rank-table').DataTable(
+                    {
+                        "pageLength": 10,
+                        "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                        "order": [[ 1, "asc" ]]
+                    }
+                );
+            } );
+        </script>
+        <title>Transitivity Rankings</title>
+    </head>
+    <body>
+        <h1>CFB Transitivity Rankings</h1>
+        <div class="row">
+            <div class="col-xs-12">
+                {{ table|safe }}
+            </div>
+        </div>
+    </body>
+</html>
