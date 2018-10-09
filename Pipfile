@@ -9,6 +9,7 @@ numpy = "*"
 networkx = "*"
 requests = "*"
 flask = "*"
+gunicorn = "*"
 
 [dev-packages]
 
