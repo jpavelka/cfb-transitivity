@@ -57,7 +57,7 @@ class TransRank:
         html_df['Avg Trans Loss'] = [self.style_float(x) for x in html_df['Avg Trans Loss']]
         if images is not None:
             html_df.index = [f'<img src="{images[t]}" class="team-logo">&nbsp&nbsp{t}' for t in html_df.index]
-        html_df.index = [x + f" ({html_df['wins'][x]}, {html_df['losses'][x]})" for x in html_df.index]
+        html_df.index = [x + f" ({html_df['wins'][x]}-{html_df['losses'][x]})" for x in html_df.index]
         html_df = html_df.drop(['wins', 'losses'], axis=1)
         html_table = html_df.to_html(classes=['table-striped', 'table-bordered', 'full-width'], table_id='rank-table',
                                      escape=False)
