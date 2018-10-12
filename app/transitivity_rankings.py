@@ -54,6 +54,9 @@ class TransRank:
     def team_link(self, team):
         return '/' + team.replace(' ', '_')
 
+    def all_team_urls(self):
+        return {t: self.team_link(t) for t in self.teams}
+
     def get_html_table(self, images=None):
         display_header_names = {'comb_rank': 'Rank', 'win_rank': 'Win Rank', 'loss_rank': 'Loss Rank',
                                 'trans_wins': 'Trans Wins', 'trans_losses': 'Trans Losses', 'avg_win_len': 'Avg Trans Win',

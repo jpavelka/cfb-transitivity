@@ -1,8 +1,22 @@
 {% extends "layout.html" %}
 {% block head %}
+<style>
+        img.team-page-header{
+            height: 50px;
+        }
+        p.path-text{
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .info-table-col-1{
+            font-weight: bold;
+        }
+</style>
 <script>
-    var paths = {{ paths | tojson | safe }}
-    var logos = {{ logos | tojson | safe }}
+    paths = {{ paths | tojson | safe }};
+    logos = {{ logos | tojson | safe }};
+    all_team_urls = {{ all_team_urls | tojson | safe }};
+    reportTeam = "{{ team }}";
     function onLoadFunc() {
         populateTeamDropdown(document.getElementById("winLossSelect").value);
     }
@@ -17,6 +31,7 @@
             opt.value = null;
             opt.innerHTML = "-- select an opponent --";
             teamSelect.appendChild(opt);
+            document.getElementById("pathInfoText").innerHTML = ""
         }
         for (var team in paths[result]) {
             var opt = document.createElement('option');
@@ -38,14 +53,27 @@
     function logoAndTeam(team, logo, pixels) {
         beforeImage = '<table style="display: inline-table;"><tbody><tr><td align="center">';
         image = '<img height="' + pixels + 'px" src="' + logo + '">';
-        afterImage = '</td></tr><tr><td align="center">' + team + '</td></tr></tbody></table>';
+        afterImage = '</td></tr><tr><td align="center"><a href="' + all_team_urls[team] + '">' + team + '</a></td></tr></tbody></table>';
         return beforeImage + image + afterImage;
     }
     function renderPath(team) {
         var result = document.getElementById("winLossSelect").value;
-        var pathDisplay = document.getElementById("pathDisplay");
-        pathDisplay.innerHTML = ''
+        var pathInfo = document.getElementById("pathInfoText");
+        pathInfo.innerHTML = '&nbsp&nbsp' + reportTeam;
         var path = paths[result][team];
+        if (result == "victories"){
+            pathInfo.innerHTML +=  ' defeats ';
+        }
+        else {
+            pathInfo.innerHTML +=  ' loses to ';
+        }
+        pathInfo.innerHTML += team + ' in ' + (path.length - 1) + ' game'
+        if (path.length > 2) {
+            pathInfo.innerHTML += 's'
+        }
+
+        var pathDisplay = document.getElementById("pathDisplay");
+        pathDisplay.innerHTML = '';
         for (var t in path) {
             if (t < path.length - 1) {
                 arrow = '<span class="glyphicon glyphicon-arrow-right" style="font-size:30px;min-height:50px;line-height:50px"></span>';
@@ -60,29 +88,24 @@
 {% endblock %}
 {% block title %}Transitive Property Report{% endblock %}
 {% block body %}
-    <h1>Transitive Property Report for {{ team }}</h1>
-    <div class="row">
-        <div class="col-xs-12">
-            Choose another team:
-            <select onchange="window.location.href = this.value">
-                <option selected disabled>-- select a team --</option>
-                {% for t in all_teams %}
-                    <option value="{{ all_team_urls[t] }}">{{ t }}</option>
-                {% endfor %}
-            </select>
-            or return to the <a href="/">rankings page</a>
-        </div>
-    </div>
+    <h1>
+        <img class="team-page-header" src="{{ logos[team] }}">
+        &nbsp&nbspTransitive Property Report - {{ team }}&nbsp&nbsp
+    </h1>
     <h2>Path visualizer</h2>
     <div class="row">
-        <div class="col-xs-4">
-            <select id="winLossSelect" onchange="populateTeamDropdown(this.value)">
+        <div class="col-xs-4 col-sm-3 col-md-2">
+            <select class="form-control" id="winLossSelect" onchange="populateTeamDropdown(this.value)">
                 <option value="victories">Win</option>
                 <option value="defeats">Loss</option>
             </select>
-            <select id="opponentSelect" onchange="renderPath(this.value)"></select>
         </div>
-        <div class="col-xs-8"></div>
+        <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
+            <select class="form-control" id="opponentSelect" onchange="renderPath(this.value)"></select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12"><p class='path-text' id="pathInfoText"></p></div>
     </div>
     <div class="row">
         <div class="col-xs-12" id="pathDisplay"></div>
@@ -90,18 +113,18 @@
     <h2>Statistics</h2>
     <div class="row"><div class="col-xs-12 col-sm-10 col-md-8 col-lg-6"><div class="row">
         <div class="col-xs-4"><table class="table"><tbody>
-            <tr><td>Win Rank</td><td>{{ '%.0f' % rank_info['win_rank'] }}</td></tr>
-            <tr><td>Transitive Wins</td><td>{{ '%.0f' % rank_info['trans_wins'] }}</td></tr>
-            <tr><td>Avg Win Length</td><td>{{ '%.2f' % rank_info['avg_win_len'] }}</td></tr>
+            <tr><td class="info-table-col-1">Win Rank</td><td>{{ '%.0f' % rank_info['win_rank'] }}</td></tr>
+            <tr><td class="info-table-col-1">Transitive Wins</td><td>{{ '%.0f' % rank_info['trans_wins'] }}</td></tr>
+            <tr><td class="info-table-col-1">Avg Win Length</td><td>{{ '%.2f' % rank_info['avg_win_len'] }}</td></tr>
         </tbody></table></div>
         <div class="col-xs-4"><table class="table"><tbody>
-            <tr><td>Loss Rank</td><td>{{ '%.0f' % rank_info['loss_rank'] }}</td></tr>
-            <tr><td>Transitive Losses</td><td>{{ '%.0f' % rank_info['trans_losses'] }}</td></tr>
-            <tr><td>Avg Loss Length</td><td>{{ '%.2f' % rank_info['avg_loss_len'] }}</td></tr>
+            <tr><td class="info-table-col-1">Loss Rank</td><td>{{ '%.0f' % rank_info['loss_rank'] }}</td></tr>
+            <tr><td class="info-table-col-1">Transitive Losses</td><td>{{ '%.0f' % rank_info['trans_losses'] }}</td></tr>
+            <tr><td class="info-table-col-1">Avg Loss Length</td><td>{{ '%.2f' % rank_info['avg_loss_len'] }}</td></tr>
         </tbody></table></div>
         <div class="col-xs-4"><table class="table"><tbody>
-            <tr><td>Overall Rank</td><td>{{ '%.0f' % rank_info['comb_rank'] }}</td></tr>
-            <tr><td>Win/Loss Rank Avg</td><td>{{ '%.2f' % rank_info['avg_rank'] }}</td></tr>
+            <tr><td class="info-table-col-1">Overall Rank</td><td>{{ '%.0f' % rank_info['comb_rank'] }}</td></tr>
+            <tr><td class="info-table-col-1">Win/Loss Rank Avg</td><td>{{ '%.2f' % rank_info['avg_rank'] }}</td></tr>
         </tbody></table></div>
     </div></div></div>
     <div class="row">
@@ -117,7 +140,7 @@
                                 <td>Level {{ i + 1 }} {{ result }} ({{ levels[result][i + 1]|length }})</td>
                                 <td>
                                     {% for t in levels[result][i + 1] %}
-                                        {{ t }}{{ "," if not loop.last }}
+                                        <a href="{{ all_team_urls[t] }}">{{ t }}</a>{{ "," if not loop.last }}
                                     {% endfor %}
                                 </td>
                             </tr>

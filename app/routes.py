@@ -11,7 +11,8 @@ def rank_page():
     if app.trans is None:
         get_trans()
     html_table = app.trans.get_html_table(images=app.logos)
-    return render_template('ranks.html', table=html_table)
+    return render_template('ranks.html', table=html_table,
+                           all_teams=app.trans.teams, all_team_urls=app.trans.all_team_urls())
 
 
 @app.route('/<team_with_underscores>')
@@ -33,9 +34,8 @@ def team_page(team):
     paths = {'victories': win_paths, 'defeats': loss_paths}
     levels = {'victories': win_levels, 'defeats': loss_levels}
     rank_info = dict(app.trans.rank_df.loc[team])
-    all_team_urls = {t: app.trans.team_link(t) for t in app.trans.teams}
     return render_template('team.html', team=team, paths=paths, levels=levels, rank_info=rank_info, logos=app.logos,
-                           all_teams = app.trans.teams, all_team_urls = all_team_urls)
+                           all_teams=app.trans.teams, all_team_urls=app.trans.all_team_urls())
 
 
 def get_levels(paths):
