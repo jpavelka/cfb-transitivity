@@ -1,12 +1,56 @@
 import requests
 import json
-from flask import render_template
+from flask import render_template, url_for
 from app import app
 from .transitivity_rankings import TransRank
 
+app.trans = None
 
 @app.route('/')
 def rank_page():
+    if app.trans is None:
+        get_trans()
+    html_table = app.trans.get_html_table(images=app.logos)
+    return render_template('ranks.html', table=html_table)
+
+
+@app.route('/<team_with_underscores>')
+def team_page_router(team_with_underscores):
+    team = team_with_underscores.replace('_', ' ')
+    return team_page(team)
+
+
+def team_page(team):
+    if app.trans is None:
+        get_trans()
+    if team not in app.trans.teams:
+        return 'Team not found'
+        # todo: make this nicer
+    win_paths = app.trans.win_paths[team]
+    win_levels = get_levels(win_paths)
+    loss_paths = app.trans.loss_paths[team]
+    loss_levels = get_levels(loss_paths)
+    paths = {'victories': win_paths, 'defeats': loss_paths}
+    levels = {'victories': win_levels, 'defeats': loss_levels}
+    rank_info = dict(app.trans.rank_df.loc[team])
+    all_team_urls = {t: app.trans.team_link(t) for t in app.trans.teams}
+    return render_template('team.html', team=team, paths=paths, levels=levels, rank_info=rank_info, logos=app.logos,
+                           all_teams = app.trans.teams, all_team_urls = all_team_urls)
+
+
+def get_levels(paths):
+    if len(paths) == 0:
+        max_length = 0
+    else:
+        max_length = max(len(paths[t]) - 1 for t in paths)
+    levels = {i + 1: [] for i in range(max_length)}
+    for t in paths:
+        levels[len(paths[t]) - 1] += [t]
+    return levels
+
+
+
+def get_trans():
     conferences_url = 'https://api.collegefootballdata.com/conferences'
     conferences = json.loads(requests.get(conferences_url).text)
     conferences = [c['name'] for c in conferences]
@@ -16,10 +60,7 @@ def rank_page():
     game_data = json.loads(requests.get(game_data_url).text)
     winners = [g['away_team'] if g['away_points'] > g['home_points'] else g['home_team'] for g in game_data]
     losers = [g['home_team'] if g['away_points'] > g['home_points'] else g['away_team'] for g in game_data]
-    trans = TransRank(winners, losers)
+    app.trans = TransRank(winners, losers)
     teams_url = 'https://api.collegefootballdata.com/teams'
     team_info = json.loads(requests.get(teams_url).text)
-    logos = {x['school']: x['logos'][0] for x in team_info if x['school'] in trans.teams}
-    html_table = trans.get_html_table(images=logos)
-    return render_template('ranks.html', table=html_table)
-
+    app.logos = {x['school']: x['logos'][0] for x in team_info if x['school'] in app.trans.teams}

@@ -9,9 +9,9 @@ class TransRank:
         win_graph.add_edges_from(zip(winners, losers))
         loss_graph = networkx.DiGraph()
         loss_graph.add_edges_from(zip(losers, winners))
-        self.teams = list(win_graph.nodes())
+        self.teams = sorted(list(win_graph.nodes()))
         win_paths = self.get_paths_from_graph(win_graph)
-        loss_paths = self.get_paths_from_graph(loss_graph)
+        loss_paths = self.get_paths_from_graph(loss_graph, reverse=True)
         df_cols = ['trans_wins', 'avg_win_len', 'win_score', 'win_rank', 'trans_losses' 'avg_loss_len', 'loss_score', 'loss_rank',
                    'avg_rank', 'comb_rank']
         rank_df = pandas.DataFrame(index=self.teams, columns=df_cols)
@@ -43,10 +43,16 @@ class TransRank:
         self.loss_paths = loss_paths
         self.rank_df = rank_df
 
-    def get_paths_from_graph(self, graph):
+    def get_paths_from_graph(self, graph, reverse=False):
         paths = {x[0]: x[1] for x in networkx.all_pairs_shortest_path(graph)}
         paths = {t: {p: paths[t][p] for p in paths[t] if p != t} for t in self.teams}
+        if reverse:
+            for t in paths:
+                paths[t] = {s: paths[t][s][::-1] for s in paths[t]}
         return paths
+
+    def team_link(self, team):
+        return '/' + team.replace(' ', '_')
 
     def get_html_table(self, images=None):
         display_header_names = {'comb_rank': 'Rank', 'win_rank': 'Win Rank', 'loss_rank': 'Loss Rank',
@@ -56,7 +62,8 @@ class TransRank:
         html_df['Avg Trans Win'] = [self.style_float(x) for x in html_df['Avg Trans Win']]
         html_df['Avg Trans Loss'] = [self.style_float(x) for x in html_df['Avg Trans Loss']]
         if images is not None:
-            html_df.index = [f'<img src="{images[t]}" class="team-logo">&nbsp&nbsp{t}' for t in html_df.index]
+            html_df.index = [f'<img src="{images[t]}" class="team-logo">&nbsp&nbsp<a href="{self.team_link(t)}">{t}</a>'
+                             for t in html_df.index]
         html_df.index = [x + f" ({html_df['wins'][x]}-{html_df['losses'][x]})" for x in html_df.index]
         html_df = html_df.drop(['wins', 'losses'], axis=1)
         html_table = html_df.to_html(classes=['table-striped', 'table-bordered', 'full-width'], table_id='rank-table',
