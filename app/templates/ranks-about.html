@@ -1,0 +1,183 @@
+{% extends "layout.html" %}
+{% block head %}
+<script>
+    function onLoadFunc() {
+        $("div.lengths-table").addClass("col-xs-10 col-sm-6 col-md-4");
+        $("div.ranks-table").addClass("col-xs-8 col-sm-5 col-md-3");
+        $("table").addClass("table");
+    }
+</script>
+{% endblock %}
+{% block title %}Transitivity Rankings - About{% endblock %}
+{% block body %}
+<h1>Transitivity Rankings Explained</h1>
+<h2>Introduction</h2>
+<p>
+    So, what is the Transitivity Ranking? It's a system for ranking all FBS teams based on the much-maligned transitive
+    argument. You know, the one that says since Team A beat Team B, and Team B beat Team C, Team A must be better than
+    Team C. Such arguments are of questionable validity, especially as the number games involved grows. But that doesn't
+    mean we can't have some fun with them!
+</p>
+<h2>Methodology, TL;DR Version</h2>
+<p>
+    Here's the quick idea for those of you who want a basic understanding but don't want to do any math. To start, we
+    must know the results of every game played to this point in the season. For simplicity, we only consider games
+    involving two teams in the FBS, the highest rung in the college football ladder. The
+    Transitivity Rankings have two components, the Win Ranking and the Loss Ranking. These rankings are determined by
+    who each team can beat via a transitive argument. To achieve a good Win Rank, your team should be able to beat lots
+    of other teams, and the arguments involved should not be very long (i.e. involve lots of games). To achieve a good
+    Loss Rank, there shouldn't be very many teams with a transitive victory over you, and among the teams that can beat
+    you, their transitive arguments should be very long.
+</p>
+<h2>Methodology, Detailed Version</h2>
+<p>Still here? Great, let's get into a little more detail.</p>
+<h3>Win Rank</h3>
+<p>
+    Let's tackle the Win Rank first. Rankings are done in two "layers". For the first layer, we count the raw number of
+    teams you can beat based on a transitive argument. Teams with transitive victories over more opponents are always
+    ranked higher than those with arguments over fewer opponents.
+</p>
+<p>
+    To break ties within this first layer, we need to know not only the number of teams you have transitive victories
+    over, but also the length of the shortest transitive argument yielding the victory. Here, "length" refers to the
+    number of games in an argument. For example, if you say Team A is better than Team D because Team A beat Team B,
+    who beat Team C, who beat Team D, the length of this path is three games. Finding the length of the shortest such
+    argument may sound like a daunting task, but as it turns out,
+    <a href="https://en.wikipedia.org/wiki/Shortest_path_problem">finding these arguments</a> is a fairly simple
+    task if you know a little <a href="https://en.wikipedia.org/wiki/Graph_theory">graph theory</a>.
+</p>
+<p>
+    Once we know the length of your shortest argument to every team, we use the average length of these arguments as the
+    tie-breaker among teams with the same number of transitive victories, with shorter average lengths being preferable
+    longer average lengths. We do not attempt to break ties beyound this point; if two teams with the same number of
+    transitive victories also have equal average argument length, they will have the same Win Rank.
+</p>
+<h3>Loss Rank</h3>
+<p>
+    The Loss Rank is calculated analagously to the Win Rank, so if you're comfortable with the above section you will
+    get this one two. The only difference is that fewer transitive losses are preferred to more, and longer arguments
+    are preferred to shorter ones.
+</p>
+<h3>Bringing it all together</h3>
+<p>
+    Once you know everyone's Win Rank and Loss Rank, the final Transitivity Ranking is determined by averaging each
+    team's Win and Loss ranks and sorting lowest to highest. For example, a team that ranks 3rd in Win Rank and 10th in
+    Loss Rank has an average ranking of 6.5. Such a team would rank higher than someone that is 5th in Win Rank and 9th
+    in Loss Rank, since the second team's average ranking of 7 is higher than 6.5.
+</p>
+<h2>
+An Example
+</h2>
+<p>
+    Like any good tutorial, we'll conclude by working through a small example so you can really see the mechanics of the
+    system. Consider a small league consisting of six teams, Teams A, B, C, D, E, and F. Every team has played three
+    games so far, and the results are given below:
+</p>
+<ul>
+    <li>Team A has beaten Teams B, E, and F.
+    <li>Team B has beaten Teams C and F.
+    <li>Team C has beaten Team D.
+    <li>Team D has beaten Teams E and F.
+    <li>Team E has beaten Team C.
+    <li>Team F has no wins.
+</ul>
+<p>
+The following graphic summarizes these results: For each pair of teams that have played a game against each other,
+there is an arrow pointing from the winning team to the losing team.
+</p>
+<p>
+<img src="/static/images/trex.jpg">
+</p>
+<p>
+    Let's find the Win Ranking for this league. Our first step is to determine who has beaten whom and the lengths of
+    the shortest arguments. I've done the hard work for you, with the results given the the table below. Numbers in the
+    table give the length of the shortest argument for the row team beating the column team, with a dash signifying
+    that no path exists.
+</p>
+<div class="row"><div class="lengths-table">
+    <table><tbody>
+        <tr><td></td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td></tr>
+        <tr><td>A</td><td>-</td><td>1</td><td>2</td><td>3</td><td>1</td><td>1</td></tr>
+        <tr><td>B</td><td>-</td><td>-</td><td>1</td><td>2</td><td>3</td><td>1</td></tr>
+        <tr><td>C</td><td>-</td><td>-</td><td>-</td><td>1</td><td>2</td><td>2</td></tr>
+        <tr><td>D</td><td>-</td><td>-</td><td>2</td><td>-</td><td>1</td><td>1</td></tr>
+        <tr><td>E</td><td>-</td><td>-</td><td>1</td><td>2</td><td>-</td><td>3</td></tr>
+        <tr><td>F</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+    </tbody></table>
+</div></div>
+<p>
+    From the table, we can see that Team A has transitive wins over all five league opponents, while Team B has wins
+    over four teams, Teams C, D, and E have wins over three opponents, and Team F has beaten nobody. Since Team A has
+    wins over the most teams, they are first in the Win Rankings. Of the remaining teams, Team B's four wins are more
+    than any team can claim, thus Team B is second. Team F is clearly last with no wins to their name.
+</p>
+<p>
+    To determine the order between teams C, D, and E, we need to find the average length of their shortest arguments.
+    Team C's shortest arguments have lengths 1, 2, and 2 games. The average is then (1+2+2)/3 = 5/3. For Team D, the
+    average is (2+1+1)/3 = 4/3, and for Team E (1+2+3)/3 = 2. Then Team D has the smallest average among the group,
+    followed by Team C and finally Team E. Thus the Win Rankings look like this:
+</p>
+<div class="row"><div class="ranks-table">
+    <table><tbody>
+        <tr><td>Rank</td><td>Team</td></tr>
+        <tr><td>1</td><td>Team A</td></tr>
+        <tr><td>2</td><td>Team B</td></tr>
+        <tr><td>3</td><td>Team D</td></tr>
+        <tr><td>4</td><td>Team C</td></tr>
+        <tr><td>5</td><td>Team E</td></tr>
+        <tr><td>6</td><td>Team F</td></tr>
+    </tbody></table>
+</div></div>
+<p>
+    For the Loss Rank, we follow a similar process. The table below gives the shortest loss lengths from the row team
+    to the column team. Astute observers will notice that this table is just the transpose of the last table
+    (switching rows with columns).
+</p>
+<div class="row"><div class="lengths-table">
+    <table><tbody>
+        <tr><td></td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td></tr>
+        <tr><td>A</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+        <tr><td>B</td><td>1</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+        <tr><td>C</td><td>2</td><td>1</td><td>-</td><td>2</td><td>1</td><td>-</td></tr>
+        <tr><td>D</td><td>3</td><td>2</td><td>1</td><td>-</td><td>2</td><td>-</td></tr>
+        <tr><td>E</td><td>1</td><td>3</td><td>2</td><td>1</td><td>-</td><td>-</td></tr>
+        <tr><td>F</td><td>1</td><td>1</td><td>2</td><td>1</td><td>3</td><td>-</td></tr>
+    </tbody></table>
+</div></div>
+<p>
+    Team A has no transitive losses. Team B has a loss to only one team, Team A. Teams C, D, and E have losses to four
+    different teams, and Team F has lost to five different teams. So, as with the Win Rankings, the Loss Rankings must
+    have Team A ranked first, Team B second, and Team F last.
+</p>
+<p>
+    To break the tie between Teams C, D, and E, we must once again determine average argument lengths. Team C's average
+    length is (2+1+2+1)/4 = 6/4 = 1.5, Team D's average is (3+2+1+2)/4 = 8/4 = 2, and Team E's average is
+    (1+3+2+1)/4 = 7/4 = 1.75. As longer loss paths are preferable to shorter ones, Team D is ranked ahead of the other
+    two, while Team E is ranked ahead of team C. So the Loss Rankings look like this:
+</p>
+<div class="row"><div class="ranks-table">
+    <table><tbody>
+        <tr><td>Rank</td><td>Team</td></tr>
+        <tr><td>1</td><td>Team A</td></tr>
+        <tr><td>2</td><td>Team B</td></tr>
+        <tr><td>3</td><td>Team D</td></tr>
+        <tr><td>4</td><td>Team E</td></tr>
+        <tr><td>5</td><td>Team C</td></tr>
+        <tr><td>6</td><td>Team F</td></tr>
+    </tbody></table>
+</div></div>
+<p>
+The final step is to average each team's Win and Loss Ranks, then sort in ascending order. The results are below.
+</p>
+<div class="row"><div class="ranks-table">
+    <table><tbody>
+        <tr><td>Rank</td><td>Team</td><td>Win/Loss Avg</td></tr>
+        <tr><td>1</td><td>Team A</td><td>1</td></tr>
+        <tr><td>2</td><td>Team B</td><td>2</td></tr>
+        <tr><td>3</td><td>Team D</td><td>3</td></tr>
+        <tr><td>4</td><td>Team C</td><td>4.5</td></tr>
+        <tr><td>4</td><td>Team E</td><td>4.5</td></tr>
+        <tr><td>6</td><td>Team F</td><td>6</td></tr>
+    </tbody></table>
+</div></div>
+{% endblock %}
