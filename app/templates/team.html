@@ -29,7 +29,7 @@
             opt.selected = true;
             opt.disabled = true;
             opt.value = null;
-            opt.innerHTML = "-- select an opponent --";
+            opt.innerHTML = "-- select opponent --";
             teamSelect.appendChild(opt);
             document.getElementById("pathInfoText").innerHTML = ""
         }
@@ -92,6 +92,7 @@
         <img class="team-page-header" src="{{ logos[team] }}">
         &nbsp&nbspTransitive Property Report - {{ team }}&nbsp&nbsp
     </h1>
+    <hr>
     <h2>Path visualizer</h2>
     <div class="row">
         <div class="col-xs-4 col-sm-3 col-md-2">
@@ -110,6 +111,7 @@
     <div class="row">
         <div class="col-xs-12" id="pathDisplay"></div>
     </div>
+    <hr>
     <h2>Statistics</h2>
     <div class="row"><div class="col-xs-12 col-sm-10 col-md-8 col-lg-6"><div class="row">
         <div class="col-xs-4"><table class="table"><tbody>
@@ -127,25 +129,42 @@
             <tr><td class="info-table-col-1">Win/Loss Rank Avg</td><td>{{ '%.2f' % rank_info['avg_rank'] }}</td></tr>
         </tbody></table></div>
     </div></div></div>
+    <hr>
     <div class="row">
         {% for result in levels %}
             <div class="col-xs-12 col-md-6">
-                <h2>Transitive {{ result }} ({{ paths[result]|length }})</h2>
-                <table class="table"><tbody>
-                    {% if levels[result]|length == 0 %}
-                        {{ team }} has no transitive {{ result }}
-                    {% else %}
-                        {% for i in range(levels[result]|length) %}
-                            <tr>
-                                <td>Level {{ i + 1 }} {{ result }} ({{ levels[result][i + 1]|length }})</td>
-                                <td>
-                                    {% for t in levels[result][i + 1] %}
-                                        <a href="{{ all_team_urls[t] }}">{{ t }}</a>{{ "," if not loop.last }}
-                                    {% endfor %}
-                                </td>
-                            </tr>
+                <h2>
+                    Transitive {{ result }} ({{ paths[result]|length }})
+                    <p role="button" class="btn btn-default hidden-md hidden-lg" data-toggle="collapse"
+                       data-target="#{{ result }}-table">show/hide</p>
+                </h2>
+                <table  class="table container collapse in" id="{{ result }}-table"><tbody>
+                    {% for i in range(levels[result]|length) %}
+                        <tr>
+                            <td class="col-sm-3">
+                                Level {{ i + 1 }} {{ result }} ({{ levels[result][i + 1]|length }})
+                            </td>
+                            <td>
+                                {% for t in levels[result][i + 1] %}
+                                    <a href="{{ all_team_urls[t] }}">{{ t }}</a>{{ "," if not loop.last }}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td>
+                        {% if result == 'victories' %}
+                            Can't beat
+                        {% else %}
+                            Can't lose to
+                        {% endif %}
+                        </td>
+                        <td>
+                        {% for t in no_paths[result] %}
+                            <a href="{{ all_team_urls[t] }}">{{ t }}</a>{{ "," if not loop.last }}
                         {% endfor %}
-                    {% endif %}
+                        </td>
+                    </tr>
                 </tbody></table>
             </div>
         {% endfor %}

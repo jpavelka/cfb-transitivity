@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
 {% block head %}
+<script src="https://cdn.datatables.net/fixedheader/3.1.2/js/dataTables.fixedHeader.min.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">
 <style>
         table.full-width{
             width: 100%;
@@ -17,7 +19,11 @@
             {
                 "pageLength": 25,
                 "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-                "order": [[ 1, "asc" ]]
+                "order": [[ 1, "asc" ]],
+                fixedHeader: {
+                    header: true,
+                    footer: true
+                }
             }
         );
     } );
@@ -26,6 +32,7 @@
 {% block title %}Transitivity Rankings{% endblock %}
 {% block body %}
     <h1>CFB Transitivity Rankings</h1>
+    <p>Confused? Learn about the methodology <a href="{{ url_for('about_rank_page') }}">here</a>.</p>
     <div class="row">
         <div class="col-xs-12">
             {{ table|safe }}

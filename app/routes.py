@@ -6,7 +6,24 @@ from .transitivity_rankings import TransRank
 
 app.trans = None
 
+
 @app.route('/')
+def home_page():
+    if app.trans is None:
+        get_trans()
+    top_ten = app.trans.rank_df.query('comb_rank <= 10')
+    top_ten_teams = list(top_ten.index)
+    top_ten_ranks = top_ten['comb_rank'].to_dict()
+    top_ten_win_ranks = top_ten['win_rank'].to_dict()
+    top_ten_loss_ranks = top_ten['loss_rank'].to_dict()
+    top_ten_avg_ranks = top_ten['avg_rank'].to_dict()
+    return render_template('index.html', all_teams=app.trans.teams, all_team_urls=app.trans.all_team_urls(),
+                           top_ten_teams=top_ten_teams, top_ten_ranks=top_ten_ranks,
+                           top_ten_win_ranks=top_ten_win_ranks, top_ten_loss_ranks=top_ten_loss_ranks,
+                           top_ten_avg_ranks=top_ten_avg_ranks, logos=app.logos, urls=app.trans.all_team_urls())
+
+
+@app.route('/rankings')
 def rank_page():
     if app.trans is None:
         get_trans()
@@ -28,17 +45,24 @@ def team_page(team):
         return 'Team not found'
         # todo: make this nicer
     win_paths = app.trans.win_paths[team]
-    win_levels = get_levels(win_paths)
+    win_levels, no_wins = get_levels(win_paths, app.trans.teams)
     loss_paths = app.trans.loss_paths[team]
-    loss_levels = get_levels(loss_paths)
+    loss_levels, no_losses = get_levels(loss_paths, app.trans.teams)
     paths = {'victories': win_paths, 'defeats': loss_paths}
     levels = {'victories': win_levels, 'defeats': loss_levels}
+    no_paths = {'victories': no_wins, 'defeats': no_losses}
     rank_info = dict(app.trans.rank_df.loc[team])
-    return render_template('team.html', team=team, paths=paths, levels=levels, rank_info=rank_info, logos=app.logos,
-                           all_teams=app.trans.teams, all_team_urls=app.trans.all_team_urls())
+    return render_template('team.html', team=team, paths=paths, no_paths=no_paths, levels=levels, rank_info=rank_info,
+                           logos=app.logos, all_teams=app.trans.teams, all_team_urls=app.trans.all_team_urls())
 
 
-def get_levels(paths):
+@app.route('/rankings/about')
+def about_rank_page():
+    return render_template('ranks-about.html')
+
+
+def get_levels(paths, all_teams):
+    included_teams = []
     if len(paths) == 0:
         max_length = 0
     else:
@@ -46,7 +70,11 @@ def get_levels(paths):
     levels = {i + 1: [] for i in range(max_length)}
     for t in paths:
         levels[len(paths[t]) - 1] += [t]
-    return levels
+        included_teams += [t]
+    for l in levels:
+        levels[l] = sorted(levels[l])
+    excluded_teams = sorted(set(all_teams) - set(included_teams))
+    return levels, excluded_teams
 
 
 
