@@ -19,6 +19,18 @@
     reportTeam = "{{ team }}";
     function onLoadFunc() {
         populateTeamDropdown(document.getElementById("winLossSelect").value);
+        {% if levels['victories'] | length > 0 %}
+            var firstOpponent = "{{ levels['victories'][levels['victories'] | length][0] }}"
+            var teamSelect = document.getElementById("opponentSelect");
+            for (var i = 0; i < teamSelect.options.length; i++) {
+                if (teamSelect.options[i].value == firstOpponent) {
+                    teamSelect.options[i].selected = true;
+                }
+            }
+            teamSelect.value = firstOpponent;
+            populateTeamDropdown(document.getElementById("winLossSelect").value);
+            renderPath(firstOpponent);
+        {% endif %}
     }
     function populateTeamDropdown(result) {
         var teamSelect = document.getElementById("opponentSelect");
