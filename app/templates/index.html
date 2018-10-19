@@ -8,22 +8,21 @@
                 <div class="col-xs-12">
                     <h2>Introduction</h2>
                     <p>
-                    The transitive property. You might remember learning about it in a high school algebra class.
-                    You’ve also certainly heard it applied as an argument for sporting preeminence - Team A beat
-                    Team B, and Team B beat Team C, therefore Team A must be better than Team C.
+                        The transitive property. You might remember learning about it in a high school algebra class.
+                        You’ve also certainly heard it applied as an argument for sporting preeminence - Team A beat
+                        Team B, and Team B beat Team C, therefore Team A must be better than Team C.
                     </p>
                     <p>
-                    Such arguments are simplistic and often lead to contradictions (what if a fourth team, Team D, has
-                    beaten Team A, but lost to Team C?). But it’s still fun to chain together transitive arguments for
-                    your team’s superiority over another,
-                    <a href="https://en.wikipedia.org/wiki/Six_Degrees_of_Kevin_Bacon">Kevin Bacon</a> style. This site
-                    serves as your interactive guide to creating such arguments in the college football world.
+                        Such arguments are simplistic and often lead to contradictions. But it’s still fun to chain
+                        together transitive arguments for your team’s superiority over another,
+                        <a href="https://en.wikipedia.org/wiki/Six_Degrees_of_Kevin_Bacon">Kevin Bacon</a> style. This
+                        site serves as your interactive guide to creating such arguments in the college football world.
                     </p>
                     <p>
-                    <b>Note:</b> this site only consider games between two FBS opponents. All games involving lower
-                    divisions are ignored completely. If you are interested in similar analyses including teams from
-                    other divisions, <a href="https://myteamisbetterthanyourteam.com">this site</a> may be of interest
-                    to you.
+                        <b>Note:</b> this site only consider games between two FBS opponents. All games involving lower
+                        divisions are ignored completely. If you are interested in similar analyses including teams from
+                        other divisions, <a href="https://myteamisbetterthanyourteam.com">this site</a> may be of
+                        interest to you.
                     </p>
                 </div>
                 <div class="col-xs-12">
@@ -37,15 +36,15 @@
                 <div class="col-xs-12">
                     <h2>Team Reports</h2>
                     Interested in your team's transitive performance for the season? Head over to the team pages to see
-                    each team's status in the Transitivity Rankings, and which teams they have beaten and been beaten by
-                    (in the transitive sense). Interested in seeing exactly how you can claim a transitive victory over
-                    a rival? Try out the Path Visualizer, which will show you the shortest transitive argument for their
-                    supremacy.
+                    each team's status in the Transitivity Rankings, and which teams they have beaten and been beaten
+                    by. Interested in seeing exactly how you can claim a transitive victory over a rival? Try out the
+                    Path Visualizer, which will show you the shortest transitive argument for their supremacy.
                 </div>
             </div>
         </div>
         <div class="col-sm-4">
             <h2>Transitive Top 10</h2>
+            <p>For full rankings, click <a href="{{ url_for('rank_page') }}">here</a></p>
             <table class="table"><tbody>
                 <tr><th>Rank</th><th>Team</th><th>Win Rank</th><th>Loss Rank</th><th>Avg Rank</th></tr>
             {% for team in top_ten_teams %}
