@@ -60,44 +60,42 @@
 {% block title %}CFB Transitive Property Report{% endblock %}
 {% block body %}
     <h1>College Football Transitive Property Report</h1>
-    <h2>Path visualizer</h2>
-    <div class="row">
-        <div class="teamSelect">
-            Choose your team
-        </div>
-        <div class="teamSelect">
-            Choose your opponent
-        </div>
-    </div>
-    <div class="row">
-        <div class="teamSelect">
-            <select class="form-control" id="myTeamSelect" onchange="teamChange()">
-                <option value=0 selected disabled>-- no team selected --</option>
-                {% for team in all_teams %}
-                    <option value="{{ team }}">{{ team }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="teamSelect">
-            <select class="form-control" id="otherTeamSelect" onchange="teamChange()">
-                <option value=0 selected disabled>-- no team selected --</option>
-                {% for team in all_teams %}
-                    <option value="{{ team }}">{{ team }}</option>
-                {% endfor %}
-            </select>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12" id="pathInfo"></div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12" id="pathDisplay"></div>
-    </div>
     <div class="row">
         <div class="col-sm-8">
             <div class="row">
                 <div class="col-xs-12">
-                    <h2>Introduction</h2>
+                    <h2>See how your team can claim a victory over your rival!</h2>
+                    <div class="row">
+                        <div class="teamSelect">
+                            Choose your team
+                        </div>
+                        <div class="teamSelect">
+                            Choose your opponent
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="teamSelect">
+                            <select class="form-control" id="myTeamSelect" onchange="teamChange()">
+                                <option value=0 selected disabled>-- no team selected --</option>
+                                {% for team in all_teams %}
+                                    <option value="{{ team }}">{{ team }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="teamSelect">
+                            <select class="form-control" id="otherTeamSelect" onchange="teamChange()">
+                                <option value=0 selected disabled>-- no team selected --</option>
+                                {% for team in all_teams %}
+                                    <option value="{{ team }}">{{ team }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-12" id="pathInfo"></div>
+                    <div class="col-xs-12" id="pathDisplay"></div>
+                </div>
+                <div class="col-xs-12">
+                    <h2>About</h2>
                     <p>
                         The transitive property. You might remember learning about it in a high school algebra class.
                         You’ve also certainly heard it applied as an argument for sporting preeminence - Team A beat
@@ -118,11 +116,11 @@
                 </div>
                 <div class="col-xs-12">
                     <h2>Rankings</h2>
-                    The Transitivity Rankings use the transitive property to measure the strength of a team's wins and
-                    unseemliness of their losses. Each team's win rank and loss rank is combined to determine an overall
-                    ranking. More detailed information can be found <a href="{{ url_for('about_rank_page') }}">here</a>.
-                    Head to the <a href="{{ url_for('rank_page') }}">rankings page</a> to see the full rankings for all
-                    FBS teams.
+                    <a href="{{ url_for('rank_page') }}">The Transitivity Rankings</a> use the transitive property to
+                    measure the strength of a team's wins and unseemliness of their losses. Each team's win rank and
+                    loss rank is combined to determine an overall ranking. More detailed information can be found
+                    <a href="{{ url_for('about_rank_page') }}">here</a>. Head to the
+                    <a href="{{ url_for('rank_page') }}">rankings page</a> to see the full rankings for all FBS teams.
                 </div>
                 <div class="col-xs-12">
                     <h2>Team Reports</h2>
