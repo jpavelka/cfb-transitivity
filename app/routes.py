@@ -1,6 +1,6 @@
 import requests
 import json
-from flask import render_template, url_for
+from flask import render_template, url_for, jsonify, request
 from app import app
 from .transitivity_rankings import TransRank
 
@@ -59,6 +59,16 @@ def team_page(team):
 @app.route('/rankings/about')
 def about_rank_page():
     return render_template('ranks-about.html')
+
+
+@app.route('/_get_path', methods=['POST'])
+def get_path():
+    my_team = request.form['my_team']
+    other_team = request.form['other_team']
+    if other_team in app.trans.win_paths[my_team]:
+        return jsonify(app.trans.win_paths[my_team][other_team])
+    else:
+        return jsonify([])
 
 
 def get_levels(paths, all_teams):

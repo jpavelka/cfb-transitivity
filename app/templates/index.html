@@ -1,7 +1,98 @@
 {% extends "layout.html" %}
+{% block head %}
+<script>
+    logos = {{ logos | tojson | safe }};
+    all_team_urls = {{ all_team_urls | tojson | safe }};
+    function onLoadFunc() {
+        $('.teamSelect').addClass('col-xs-6 col-sm-5 col-md-4 col-lg-3');
+    }
+    function teamChange() {
+        var myTeam = document.getElementById("myTeamSelect").value;
+        var otherTeam = document.getElementById("otherTeamSelect").value;
+        if (myTeam != 0 && otherTeam != 0){
+            $.ajax({
+                type: "POST",
+                url: "{{ url_for('get_path') }}",
+                data: {'my_team': myTeam, 'other_team': otherTeam},
+                success: function(result){buildPath(result);}
+            })
+        }
+    }
+    function buildPath(path) {
+        var pathInfo = document.getElementById("pathInfo");
+        var pathDisplay = document.getElementById("pathDisplay");
+        pathDisplay.innerHTML = '';
+        if (path.length > 0){
+            var reportTeam = path[0];
+            var team = path.slice(-1)[0];
+            pathInfo.innerHTML = '&nbsp&nbsp' + reportTeam;
+            pathInfo.innerHTML +=  ' defeats ';
+            pathInfo.innerHTML += team + ' in ' + (path.length - 1) + ' game'
+            if (path.length > 2) {
+                pathInfo.innerHTML += 's'
+            }
+            var pathDisplay = document.getElementById("pathDisplay");
+            pathDisplay.innerHTML = '';
+            for (var t in path) {
+                if (t < path.length - 1) {
+                    arrow = '<span class="glyphicon glyphicon-arrow-right" style="font-size:30px;min-height:50px;line-height:50px"></span>';
+                }
+                else {
+                    arrow = ''
+                }
+                pathDisplay.innerHTML += '&nbsp' + logoAndTeam(path[t], logos[path[t]], 50) + arrow + '&nbsp';
+            }
+        }
+        else {
+            var myTeam = document.getElementById("myTeamSelect").value;
+            var otherTeam = document.getElementById("otherTeamSelect").value;
+            pathInfo.innerHTML = myTeam + " cannot beat " + otherTeam + " - Try another selection";
+        }
+    }
+    function logoAndTeam(team, logo, pixels) {
+        beforeImage = '<table style="display: inline-table;"><tbody><tr><td align="center">';
+        image = '<img height="' + pixels + 'px" src="' + logo + '">';
+        afterImage = '</td></tr><tr><td align="center"><a href="' + all_team_urls[team] + '">' + team + '</a></td></tr></tbody></table>';
+        return beforeImage + image + afterImage;
+    }
+</script>
+{% endblock %}
 {% block title %}CFB Transitive Property Report{% endblock %}
 {% block body %}
     <h1>College Football Transitive Property Report</h1>
+    <h2>Path visualizer</h2>
+    <div class="row">
+        <div class="teamSelect">
+            Choose your team
+        </div>
+        <div class="teamSelect">
+            Choose your opponent
+        </div>
+    </div>
+    <div class="row">
+        <div class="teamSelect">
+            <select class="form-control" id="myTeamSelect" onchange="teamChange()">
+                <option value=0 selected disabled>-- no team selected --</option>
+                {% for team in all_teams %}
+                    <option value="{{ team }}">{{ team }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="teamSelect">
+            <select class="form-control" id="otherTeamSelect" onchange="teamChange()">
+                <option value=0 selected disabled>-- no team selected --</option>
+                {% for team in all_teams %}
+                    <option value="{{ team }}">{{ team }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12" id="pathInfo"></div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12" id="pathDisplay"></div>
+    </div>
     <div class="row">
         <div class="col-sm-8">
             <div class="row">
