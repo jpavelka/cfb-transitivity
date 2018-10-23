@@ -168,8 +168,9 @@
                         {% if result == 'victories' %}
                             Can't beat
                         {% else %}
-                            Can't lose to
+                            Can't lose
                         {% endif %}
+                        &nbsp({{ no_paths[result] | length }})
                         </td>
                         <td>
                         {% for t in no_paths[result] %}

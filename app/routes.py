@@ -45,9 +45,9 @@ def team_page(team):
         return 'Team not found'
         # todo: make this nicer
     win_paths = app.trans.win_paths[team]
-    win_levels, no_wins = get_levels(win_paths, app.trans.teams)
+    win_levels, no_wins = get_levels(win_paths, app.trans.teams, team)
     loss_paths = app.trans.loss_paths[team]
-    loss_levels, no_losses = get_levels(loss_paths, app.trans.teams)
+    loss_levels, no_losses = get_levels(loss_paths, app.trans.teams, team)
     paths = {'victories': win_paths, 'defeats': loss_paths}
     levels = {'victories': win_levels, 'defeats': loss_levels}
     no_paths = {'victories': no_wins, 'defeats': no_losses}
@@ -71,7 +71,7 @@ def get_path():
         return jsonify([])
 
 
-def get_levels(paths, all_teams):
+def get_levels(paths, all_teams, team):
     included_teams = []
     if len(paths) == 0:
         max_length = 0
@@ -83,7 +83,7 @@ def get_levels(paths, all_teams):
         included_teams += [t]
     for l in levels:
         levels[l] = sorted(levels[l])
-    excluded_teams = sorted(set(all_teams) - set(included_teams))
+    excluded_teams = sorted(set(all_teams) - set(included_teams) -{team})
     return levels, excluded_teams
 
 
