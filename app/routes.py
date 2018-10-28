@@ -87,15 +87,12 @@ def get_levels(paths, all_teams, team):
     return levels, excluded_teams
 
 
-
 def get_trans():
-    conferences_url = 'https://api.collegefootballdata.com/conferences'
-    conferences = json.loads(requests.get(conferences_url).text)
-    conferences = [c['name'] for c in conferences]
+    conferences = ['ACC', 'American Athletic', 'Big 12', 'Big Ten', 'Conference USA', 'FBS Independents',
+                   'Mid-American', 'Mountain West', 'Pac-12', 'SEC', 'Sun Belt']
     game_data_url = 'https://api.collegefootballdata.com/games?year=2018'
-    game_data_url += '&home_conference=' + ','.join(conferences).replace(' ', '%20')
-    game_data_url += '&away_conference=' + ','.join(conferences).replace(' ', '%20')
     game_data = json.loads(requests.get(game_data_url).text)
+    game_data = [g for g in game_data if g['home_conference'] in conferences and g['away_conference'] in conferences]
     winners = [g['away_team'] if g['away_points'] > g['home_points'] else g['home_team'] for g in game_data]
     losers = [g['home_team'] if g['away_points'] > g['home_points'] else g['away_team'] for g in game_data]
     app.trans = TransRank(winners, losers)
